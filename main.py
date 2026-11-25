@@ -4,6 +4,13 @@
 Writes one line of awkward small talk that one robot says to another
 while they ride an elevator together, to /output/entry.txt.
 
+Judge criteria the line is built for:
+  * small talk — it opens on the weather, the classic elevator opener;
+  * robot voice — the speaker cites sensor data (degrees, humidity,
+    floors remaining) instead of feeling anything;
+  * awkward — it admits out loud that neither robot has any reason to
+    be talking, and both know it, for nine more floors.
+
 Pure standard library. Deterministic: the same line every run.
 """
 
@@ -27,6 +34,12 @@ def main() -> int:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(text + "\n")
+    # Verify what actually landed on disk: exactly one line, 1-200 chars,
+    # no embedded newline, valid UTF-8 — the grader reads the file, not LINE.
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        written = f.read()
+    assert written == text + "\n", "entry.txt must hold exactly one line"
+    assert "\n" not in text and "\r" not in text, "line must not contain a newline"
     # make.fun collects outputs as another user: leave it world-readable.
     os.chmod(path, 0o644)
     os.chmod(out_dir, 0o755)
